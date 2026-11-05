@@ -1263,16 +1263,19 @@
         else warningEl.classList.add('hidden');
       }
 
-      let savedOnlineUrl = localStorage.getItem('holland_online_url') || '';
-      let targetUrl = savedOnlineUrl;
+      let targetUrl = '';
 
-      if (!targetUrl) {
-        if (isFileProtocol) {
-          targetUrl = 'https://';
-        } else {
-          // Lấy toàn bộ đường dẫn URL hiện tại (bao gồm cả tên kho / repository trên GitHub Pages)
-          // và tự động loại bỏ các tham số như ?role=teacher để học sinh quét vào thẳng trang làm bài
-          targetUrl = window.location.href.split('?')[0].split('#')[0];
+      if (isFileProtocol) {
+        // Nếu mở file tĩnh từ máy tính (file://)
+        targetUrl = localStorage.getItem('holland_online_url') || '';
+      } else {
+        // NẾU ĐANG CHẠY TRÊN WEB (GitHub Pages, Netlify,...):
+        // Luôn luôn lấy chính xác đường link thực tế đầy đủ của trang web (gồm cả tên repository)
+        // và tự động cắt bỏ tham số ?role=teacher để học sinh quét vào thẳng giao diện làm bài
+        targetUrl = window.location.href.split('?')[0].split('#')[0];
+        
+        // Nếu trên Python server nội bộ localhost
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
           try {
             const res = await fetch('/api/info');
             if (res.ok) {
@@ -1282,6 +1285,9 @@
           } catch (e) {}
         }
       }
+
+      // Xóa link cũ bị lưu sai trong bộ nhớ tạm trình duyệt
+      localStorage.removeItem('holland_online_url');
 
       document.getElementById('qrLinkInput').value = targetUrl;
       renderQRCodeCanvas(targetUrl);
@@ -1296,14 +1302,21 @@
         container.innerHTML = '<div class="w-48 h-48 flex items-center justify-center text-xs text-slate-400 text-center p-3">Hãy dán đường link online hợp lệ để tạo mã QR</div>';
         return;
       }
-      new QRCode(container, {
-        text: text,
-        width: 220,
-        height: 220,
-        colorDark: "#1e293b",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.M
-      });
+      
+      try {
+        new QRCode(container, {
+          text: text,
+          width: 220,
+          height: 220,
+          colorDark: "#1e293b",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } catch (err) {
+        // Dự phòng: tự động tạo QR qua API hình ảnh nếu thư viện bị lỗi
+        const encoded = encodeURIComponent(text);
+        container.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encoded}" alt="Mã QR" class="w-[220px] h-[220px] mx-auto block rounded-lg shadow-xs" />`;
+      }
     }
 
     function onCustomLinkChange(newUrl) {
