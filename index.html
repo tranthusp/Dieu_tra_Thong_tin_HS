@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Khám Phá Bản Thân - Trắc Nghiệm Nghề Nghiệp Holland</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- QRCode.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- SheetJS (Excel Export) -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+  <!-- Font Google Be Vietnam Pro -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Be Vietnam Pro"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    @media print {
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+      body { background: white !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-100">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs no-print">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-lg shadow-sm shadow-blue-300">
+          🎯
+        </div>
+        <div>
+          <h1 class="font-bold text-base sm:text-lg text-slate-900 leading-tight">Định Hướng Nghề Nghiệp</h1>
+          <p class="text-xs text-slate-500">Mật mã John Holland • SBT Hướng Nghiệp</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <!-- Chuyển đổi chế độ Học sinh / Giáo viên -->
+        <button id="btnSwitchToTeacher" onclick="toggleView('teacher')" class="px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition flex items-center gap-1.5">
+          <span>👩‍🏫</span>
+          <span class="hidden sm:inline">Dành cho</span> Giáo Viên
+        </button>
+        <button id="btnSwitchToStudent" onclick="toggleView('student')" class="hidden px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition items-center gap-1.5">
+          <span>📱</span>
+          <span>Màn hình Học sinh</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================== -->
+  <!-- 1. GIAO DIỆN HỌC SINH (MOBILE FIRST)     -->
+  <!-- ========================================== -->
+  <main id="studentView" class="flex-1 max-w-xl w-full mx-auto p-4 sm:p-6 pb-24">
+
+    <!-- STEP 1: NHẬP THÔNG TIN HỌC SINH -->
+    <div id="studentStepIntro" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+      <div class="text-center mb-6">
+        <span class="inline-block p-3 bg-blue-50 text-blue-600 rounded-2xl text-3xl mb-2">🧭</span>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Khám Phá Xu Hướng Nghề Nghiệp</h2>
+        <p class="text-sm text-slate-500 mt-1">Bài tập tự đánh giá 6 bảng tiêu chí (A, B, C, D, E, G). Điểm mỗi câu: <strong>1 điểm</strong> nếu phù hợp, <strong>0 điểm</strong> nếu không.</p>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Họ và tên của em <span class="text-rose-500">*</span></label>
+          <input type="text" id="inputStudentName" placeholder="Ví dụ: Nguyễn Văn An" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-base font-medium">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Lớp <span class="text-rose-500">*</span></label>
+          <input type="text" id="inputStudentClass" placeholder="Ví dụ: 10A1 hoặc 11B2" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-base font-medium">
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-xs text-amber-800 leading-relaxed">
+          💡 <strong>Cách làm bài:</strong> Có 6 bảng tiêu chí, mỗi bảng 10 câu. Hãy đọc kỹ từng ý và chọn <strong>"Đúng với tôi (1 điểm)"</strong> hoặc <strong>"Không đúng (0 điểm)"</strong>. Hệ thống sẽ ngay lập tức tính điểm và báo kết quả!
+        </div>
+
+        <button onclick="startQuiz()" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition transform active:scale-98 text-base flex items-center justify-center gap-2">
+          <span>Bắt đầu tự chấm điểm</span>
+          <span>👉</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 2: LÀM BÀI 6 BẢNG TIÊU CHÍ -->
+    <div id="studentStepQuiz" class="hidden space-y-5">
+      
+      <!-- Thông tin học sinh đang làm & Thanh Tab 6 Bảng -->
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 sticky top-16 z-30">
+        <div class="flex items-center justify-between mb-3 text-xs">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="font-bold text-slate-700" id="displayActiveStudent">Nguyễn Văn An</span>
+            <span class="text-slate-400">• Lớp <span id="displayActiveClass">10A1</span></span>
+          </div>
+          <div class="font-semibold text-blue-600" id="totalScoreCount">Tổng: 0/60 điểm</div>
+        </div>
+
+        <!-- 6 Tabs -->
+        <div class="grid grid-cols-6 gap-1 bg-slate-100 p-1 rounded-xl" id="tableTabs">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Danh sách câu hỏi của Bảng đang chọn -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+          <div>
+            <span id="currentTableBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700">Bảng A</span>
+            <h3 id="currentTableTitle" class="text-lg font-bold text-slate-900 mt-1">Nhóm Kĩ thuật</h3>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-slate-400 block">Điểm bảng này</span>
+            <span id="currentTableScoreBadge" class="text-xl font-black text-blue-600">0/10</span>
+          </div>
+        </div>
+
+        <!-- List các câu hỏi -->
+        <div id="questionsContainer" class="space-y-3.5">
+          <!-- Rendered via JS -->
+        </div>
+
+        <!-- Nút điều hướng bảng trước / tiếp theo -->
+        <div class="flex items-center justify-between mt-6 pt-4 border-t border-slate-100 gap-3">
+          <button id="btnPrevTable" onclick="prevTable()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition">
+            ← Bảng trước
+          </button>
+          <button id="btnNextTable" onclick="nextTable()" class="flex-1 px-4 py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-sm hover:bg-blue-700 transition flex items-center justify-center gap-1 shadow-md shadow-blue-500/20">
+            <span>Bảng tiếp theo</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Nút nộp bài cuối cùng (luôn sẵn sàng khi học sinh muốn hoàn thành) -->
+      <div class="bg-gradient-to-r from-indigo-50 to-blue-50 border border-blue-200 rounded-2xl p-4 text-center">
+        <p class="text-xs text-slate-600 mb-2.5">Em có thể kiểm tra lại tất cả 6 bảng hoặc bấm xem kết quả ngay</p>
+        <button onclick="submitStudentResults()" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition transform active:scale-98 text-base flex items-center justify-center gap-2">
+          <span>✨</span>
+          <span>Xem Kết Quả Phân Tích Ngay</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 3: MÀN HÌNH HIỆN NGAY KẾT QUẢ PHÂN TÍCH (CHO HỌC SINH) -->
+    <div id="studentStepResult" class="hidden space-y-6">
+
+      <!-- Thông báo đã lưu -->
+      <div id="syncStatusBadge" class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs px-4 py-2.5 rounded-xl flex items-center justify-between shadow-xs">
+        <span class="flex items-center gap-1.5 font-medium">
+          <span class="text-base">✅</span> Đã tổng hợp kết quả & gửi tới Giáo viên
+        </span>
+        <span class="text-[11px] text-emerald-600 font-semibold" id="resultTimestamp"></span>
+      </div>
+
+      <!-- Thẻ Vinh Danh / Nhóm Cao Nhất -->
+      <div class="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-blue-600 to-sky-500 text-white rounded-3xl p-6 sm:p-7 shadow-xl shadow-blue-500/25">
+        <div class="absolute -right-8 -bottom-8 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="relative z-10">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold mb-3">
+            <span>🌟</span>
+            <span>Nhóm Nổi Trội Nhất Của Em</span>
+          </div>
+
+          <h2 id="resultTopGroupName" class="text-2xl sm:text-3xl font-extrabold tracking-tight">Nhóm Kĩ Thuật</h2>
+          <p id="resultTopGroupTag" class="text-sm text-blue-100 font-medium mt-0.5">Bảng A • Đạt 9/10 điểm</p>
+
+          <!-- Huy hiệu phụ nếu có nhóm nhì sát điểm -->
+          <div id="resultSecondaryBadge" class="hidden mt-3 inline-block bg-white/15 px-3 py-1 rounded-lg text-xs font-medium text-amber-200">
+          </div>
+        </div>
+      </div>
+
+      <!-- BẢNG TỔNG HỢP (CHUẨN FORM TRONG SÁCH BÀI TẬP) -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-3">
+          <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+            <span>📋</span> Bảng Tổng Hợp Trong SBT
+          </h3>
+          <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-md font-medium">HĐTN, Hướng Nghiệp</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200 text-xs uppercase tracking-wider">
+                <th class="py-2.5 px-3">Bảng</th>
+                <th class="py-2.5 px-3">Nhóm nghề</th>
+                <th class="py-2.5 px-3 text-center">Số điểm em đạt</th>
+                <th class="py-2.5 px-2 text-center">Đánh giá</th>
+              </tr>
+            </thead>
+            <tbody id="sbtSummaryTableBody" class="divide-y divide-slate-100 font-medium">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BIỂU ĐỒ NĂNG LỰC 6 NHÓM -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <h3 class="font-bold text-slate-900 text-base mb-2 flex items-center gap-2">
+          <span>📊</span> Biểu Đồ Phổ Năng Lực Của Em
+        </h3>
+        <p class="text-xs text-slate-500 mb-4">Biểu đồ thể hiện mức độ tương thích của em với 6 nhóm mật mã Holland</p>
+        <div class="relative h-64 w-full">
+          <canvas id="studentRadarChart"></canvas>
+        </div>
+      </div>
+
+      <!-- ĐẶC ĐIỂM TÍNH CÁCH & GỢI Ý NGÀNH NGHỀ PHÙ HỢP -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-5">
+        <div>
+          <h4 class="font-bold text-slate-900 text-base mb-2 flex items-center gap-2 text-indigo-700">
+            <span>💡</span> Đặc Điểm Nổi Bật Của Em
+          </h4>
+          <p id="resultTraitsDesc" class="text-sm text-slate-600 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+            Đang tải dữ liệu phân tích...
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-slate-900 text-base mb-2 flex items-center gap-2 text-emerald-700">
+            <span>🎓</span> Các Ngành Nghề Gợi Ý Phù Hợp
+          </h4>
+          <div id="resultCareersList" class="flex flex-wrap gap-2 pt-1">
+            <!-- Badges nghề nghiệp -->
+          </div>
+        </div>
+
+        <div class="border-t border-slate-100 pt-4">
+          <h4 class="font-bold text-slate-900 text-sm mb-1.5 flex items-center gap-2 text-amber-700">
+            <span>🌱</span> Lời Khuyên Phát Triển Bản Thân
+          </h4>
+          <p id="resultAdviceDesc" class="text-xs text-slate-500 leading-relaxed">
+            Hãy tiếp tục rèn luyện và trải nghiệm thêm các hoạt động thực tế để định hình rõ hơn mục tiêu nghề nghiệp tương lai nhé!
+          </p>
+        </div>
+      </div>
+
+      <!-- Nút Thao Tác: Làm lại / In kết quả -->
+      <div class="flex gap-3 no-print">
+        <button onclick="retakeQuiz()" class="flex-1 py-3 rounded-xl border border-slate-300 text-slate-700 font-bold text-sm hover:bg-slate-100 transition">
+          🔄 Tự chấm lại
+        </button>
+        <button onclick="window.print()" class="flex-1 py-3 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition flex items-center justify-center gap-1.5 shadow-md">
+          <span>🖨️</span>
+          <span>In / Lưu PDF</span>
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+
+  <!-- ========================================== -->
+  <!-- 2. GIAO DIỆN GIÁO VIÊN (TEACHER DASHBOARD)  -->
+  <!-- ========================================== -->
+  <main id="teacherView" class="hidden flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 pb-24">
+
+    <!-- Header Giáo viên & Mã QR cho học sinh quét -->
+    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 mb-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold mb-2">
+            <span>👩‍🏫</span> BẢNG ĐIỀU KHIỂN GIÁO VIÊN
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Tổng Hợp Đánh Giá Cả Lớp</h2>
+          <p class="text-sm text-slate-500 mt-1">Dữ liệu từ điện thoại của học sinh sẽ tự động cập nhật ngay tức thì tại bảng này.</p>
+        </div>
+
+        <!-- Nút mở Mã QR để học sinh quét -->
+        <div class="flex flex-wrap items-center gap-2.5">
+          <button onclick="showQRCodeModal()" class="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl text-sm shadow-md shadow-blue-500/20 flex items-center gap-2 transition">
+            <span>📱</span>
+            <span>Chiếu Mã QR Cho Học Sinh Quét</span>
+          </button>
+          <button onclick="exportToExcel()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm shadow-md shadow-emerald-500/20 flex items-center gap-2 transition">
+            <span>📥</span>
+            <span>Xuất File Excel</span>
+          </button>
+          <button onclick="loadTeacherResults()" class="p-2.5 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600" title="Làm mới dữ liệu">
+            🔄
+          </button>
+        </div>
+      </div>
+
+      <!-- THẺ THỐNG KÊ NHANH (CARDS) -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-6">
+        <div class="bg-blue-50/70 border border-blue-100 rounded-2xl p-4">
+          <span class="text-xs text-blue-600 font-bold uppercase tracking-wider block">Tổng Học Sinh Đã Nộp</span>
+          <span id="statTotalStudents" class="text-2xl sm:text-3xl font-black text-blue-900 mt-1 block">0</span>
+        </div>
+        <div class="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-4">
+          <span class="text-xs text-emerald-600 font-bold uppercase tracking-wider block">Số Lớp Tham Gia</span>
+          <span id="statTotalClasses" class="text-2xl sm:text-3xl font-black text-emerald-900 mt-1 block">0</span>
+        </div>
+        <div class="bg-amber-50/70 border border-amber-100 rounded-2xl p-4">
+          <span class="text-xs text-amber-600 font-bold uppercase tracking-wider block">Nhóm Phổ Biến Nhất</span>
+          <span id="statTopGroup" class="text-lg sm:text-xl font-bold text-amber-900 mt-1 truncate block">-</span>
+        </div>
+        <div class="bg-purple-50/70 border border-purple-100 rounded-2xl p-4">
+          <span class="text-xs text-purple-600 font-bold uppercase tracking-wider block">Trạng Thái Đồng Bộ</span>
+          <span id="statSyncStatus" class="text-xs font-semibold text-purple-800 mt-2 flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Tự động cập nhật
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BIỂU ĐỒ THỐNG KÊ PHÂN BỐ CẢ LỚP -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <div class="lg:col-span-2 bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+        <h3 class="font-bold text-slate-900 text-base mb-1 flex items-center gap-2">
+          <span>📊</span> Phân Bố Học Sinh Theo 6 Nhóm Nghề Nghiệp
+        </h3>
+        <p class="text-xs text-slate-500 mb-4">Số lượng học sinh có thế mạnh nổi trội nhất theo từng nhóm</p>
+        <div class="relative h-64 w-full">
+          <canvas id="teacherBarChart"></canvas>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between">
+        <div>
+          <h3 class="font-bold text-slate-900 text-base mb-1 flex items-center gap-2">
+            <span>⚙️</span> Tùy Chọn & Kết Nối
+          </h3>
+          <p class="text-xs text-slate-500 mb-4">Dữ liệu được lưu trữ tự động</p>
+          
+          <div class="space-y-3 text-xs text-slate-600">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <span class="font-bold text-slate-800 block mb-0.5">💻 Máy chủ nội bộ (LAN):</span>
+              Học sinh trong cùng mạng Wi-Fi quét mã QR là gửi bài tức thì vào bảng điểm.
+            </div>
+            <div class="p-3 bg-emerald-50 text-emerald-900 rounded-xl border border-emerald-100">
+              <span class="font-bold text-emerald-800 block mb-0.5">📑 Xuất File Báo Cáo:</span>
+              Bấm "Xuất File Excel" để tải về file Excel chuẩn tên, lớp và điểm chi tiết từng bảng.
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 flex gap-2">
+          <button onclick="clearAllDataConfirm()" class="w-full py-2.5 px-3 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold transition">
+            🗑️ Xóa dữ liệu cũ (Làm bài mới)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BẢNG TỔNG HỢP TOÀN BỘ HỌC SINH -->
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+      <!-- Bộ lọc và tìm kiếm -->
+      <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h3 class="font-bold text-slate-900 text-lg">Danh Sách Bảng Tổng Hợp Chi Tiết</h3>
+          <p class="text-xs text-slate-500">Mỗi dòng là kết quả bảng tổng hợp SBT của một học sinh</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+          <!-- Lọc theo lớp -->
+          <select id="filterClassSelect" onchange="renderTeacherTable()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-slate-50 outline-none">
+            <option value="ALL">Tất cả các lớp</option>
+          </select>
+          <!-- Ô tìm kiếm tên -->
+          <input type="text" id="searchStudentInput" oninput="renderTeacherTable()" placeholder="🔍 Tìm tên học sinh..." class="px-3.5 py-2 rounded-xl border border-slate-200 text-xs outline-none focus:ring-2 focus:ring-blue-500 w-40 sm:w-48">
+        </div>
+      </div>
+
+      <!-- Bảng dữ liệu -->
+      <div class="overflow-x-auto custom-scrollbar">
+        <table class="w-full text-xs sm:text-sm text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 text-[11px] sm:text-xs uppercase tracking-wider">
+              <th class="py-3 px-3 text-center w-12">STT</th>
+              <th class="py-3 px-4">Họ và tên</th>
+              <th class="py-3 px-3 text-center">Lớp</th>
+              <th class="py-3 px-2 text-center text-blue-700 bg-blue-50/50" title="Bảng A - Kĩ thuật">Bảng A<br><span class="text-[10px] font-normal text-slate-500">Kĩ thuật</span></th>
+              <th class="py-3 px-2 text-center text-emerald-700 bg-emerald-50/50" title="Bảng B - Nghiên cứu">Bảng B<br><span class="text-[10px] font-normal text-slate-500">N.Cứu</span></th>
+              <th class="py-3 px-2 text-center text-purple-700 bg-purple-50/50" title="Bảng C - Nghệ thuật">Bảng C<br><span class="text-[10px] font-normal text-slate-500">N.Thuật</span></th>
+              <th class="py-3 px-2 text-center text-amber-700 bg-amber-50/50" title="Bảng D - Xã hội">Bảng D<br><span class="text-[10px] font-normal text-slate-500">Xã hội</span></th>
+              <th class="py-3 px-2 text-center text-rose-700 bg-rose-50/50" title="Bảng E - Quản lí">Bảng E<br><span class="text-[10px] font-normal text-slate-500">Quản lí</span></th>
+              <th class="py-3 px-2 text-center text-teal-700 bg-teal-50/50" title="Bảng G - Nghiệp vụ">Bảng G<br><span class="text-[10px] font-normal text-slate-500">N.Vụ</span></th>
+              <th class="py-3 px-4 text-center font-bold">Nhóm Cao Nhất</th>
+              <th class="py-3 px-3 text-center text-slate-400">Thời gian</th>
+            </tr>
+          </thead>
+          <tbody id="teacherTableBody" class="divide-y divide-slate-100 font-medium text-slate-700">
+            <!-- Rendered via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer đếm số lượng -->
+      <div class="p-4 border-t border-slate-100 text-xs text-slate-500 flex items-center justify-between">
+        <span id="tableShowingCount">Hiển thị 0 học sinh</span>
+        <span>Cập nhật tự động</span>
+      </div>
+    </div>
+
+  </main>
+
+
+  <!-- ========================================== -->
+  <!-- MODAL: MÃ QR CHIẾU LÊN CHO HỌC SINH QUÉT -->
+  <!-- ========================================== -->
+  <div id="qrModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 text-center shadow-2xl relative animate-in fade-in zoom-in duration-200">
+      <button onclick="hideQRCodeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center font-bold text-sm">
+        ✕
+      </button>
+
+      <span class="inline-block p-3 bg-blue-50 text-blue-600 rounded-2xl text-2xl mb-2">📷</span>
+      <h3 class="text-xl font-extrabold text-slate-900">Quét Mã QR Để Làm Bài</h3>
+      <p class="text-xs text-slate-500 mt-1 mb-5">Học sinh mở camera điện thoại hoặc Zalo để quét mã và vào làm bài ngay</p>
+
+      <div class="flex justify-center mb-5">
+        <div id="qrcodeCanvas" class="p-4 bg-white border-2 border-dashed border-indigo-200 rounded-2xl shadow-inner"></div>
+      </div>
+
+      <div class="bg-slate-50 rounded-xl p-3 text-left mb-4 border border-slate-100">
+        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Đường dẫn làm bài:</span>
+        <div class="flex items-center justify-between gap-2">
+          <input id="qrLinkInput" type="text" readonly class="text-xs font-mono text-blue-700 bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 w-full select-all">
+          <button onclick="copyQRLink()" class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold shrink-0 hover:bg-blue-700">
+            Sao chép
+          </button>
+        </div>
+      </div>
+
+      <button onclick="hideQRCodeModal()" class="w-full py-3 bg-slate-900 text-white font-bold rounded-xl text-sm">
+        Đóng cửa sổ
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- JAVASCRIPT: LOGIC TOÀN BỘ ỨNG DỤNG         -->
+  <!-- ========================================== -->
+  <script>
+    // ----------------------------------------------------
+    // 1. DỮ LIỆU ĐẦY ĐỦ 6 BẢNG (CHÍNH XÁC 100% THEO HÌNH ẢNH)
+    // ----------------------------------------------------
+    const HOLLAND_DATA = {
+      tables: [
+        {
+          id: 'A',
+          name: 'Nhóm Kĩ thuật',
+          code: 'Realistic (R)',
+          badgeColor: 'blue',
+          description: 'Người có xu hướng thích hành động, làm việc với công cụ dụng cụ, thể thao, kỹ thuật và yêu thích thiên nhiên.',
+          careers: ['Kỹ sư cơ khí', 'Kỹ thuật ô tô', 'Kỹ sư xây dựng', 'Lâm nghiệp & Nông nghiệp', 'Điện - Điện tử', 'Huấn luyện viên thể thao', 'Kỹ thuật viên âm thanh/ánh sáng', 'Vận động viên'],
+          advice: 'Em nên tiếp tục phát huy khả năng khéo léo, kỹ năng giải quyết các vấn đề kỹ thuật và tham gia các hoạt động ngoại khóa, chế tạo thực hành.',
+          questions: [
+            "Tôi tự thấy mình là người khá về các môn thể thao.",
+            "Tôi là người yêu thích thiên nhiên.",
+            "Tôi là người hay tò mò về thế giới xung quanh mình (thiên nhiên, không gian, những sinh vật sống).",
+            "Tôi là người độc lập.",
+            "Tôi thích sửa chữa đồ vật, vật dụng xung quanh tôi.",
+            "Tôi thích làm việc sử dụng tay chân (làm vườn, sửa chữa nhà cửa).",
+            "Tôi thích tập thể dục.",
+            "Tôi thích dành dụm tiền.",
+            "Tôi thích làm việc cho đến khi công việc hoàn thành (không thích bỏ dở việc).",
+            "Tôi thích làm việc một mình."
+          ]
+        },
+        {
+          id: 'B',
+          name: 'Nhóm Nghiên cứu',
+          code: 'Investigative (I)',
+          badgeColor: 'emerald',
+          description: 'Người có óc quan sát sắc bén, tư duy logic, thích phân tích, giải toán và tìm hiểu bản chất khoa học của sự việc.',
+          careers: ['Nhà khoa học', 'Bác sĩ / Dược sĩ', 'Chuyên gia phân tích dữ liệu (Data)', 'Lập trình viên / CNTT', 'Kỹ sư công nghệ sinh học', 'Nhà nghiên cứu kinh tế', 'Nhà tâm lý học'],
+          advice: 'Hãy duy trì thói quen đọc sách, nghiên cứu chuyên sâu và rèn luyện thêm kỹ năng thuyết trình, chia sẻ tri thức khoa học với mọi người.',
+          questions: [
+            "Tôi là người cẩn thận, hay để ý tới chi tiết.",
+            "Tôi tò mò về mọi thứ.",
+            "Tôi có thể tính những bài toán phức tạp.",
+            "Tôi thích giải các bài tập toán.",
+            "Tôi thích sử dụng máy tính.",
+            "Tôi rất thích đọc sách.",
+            "Tôi thích sưu tập (đá, tem, tiền đồng).",
+            "Tôi thích trò chơi ô chữ.",
+            "Tôi thích học các môn khoa học.",
+            "Tôi thích những thách thức."
+          ]
+        },
+        {
+          id: 'C',
+          name: 'Nhóm Nghệ thuật',
+          code: 'Artistic (A)',
+          badgeColor: 'purple',
+          description: 'Người giàu cảm xúc, trí tưởng tượng phong phú, có khiếu thẩm mỹ, âm nhạc, nghệ thuật và thích thể hiện cá tính tự do.',
+          careers: ['Thiết kế đồ họa / Đa phương tiện', 'Kiến trúc sư', 'Họa sĩ / Họa sĩ minh họa', 'Nhà văn / Biên kịch / Nhà báo', 'Nhạc sĩ / Ca sĩ', 'Thiết kế thời trang', 'Sáng tạo nội dung (Content Creator)', 'Đạo diễn / Nhiếp ảnh'],
+          advice: 'Em hãy tự tin thể hiện những ý tưởng độc đáo của mình, xây dựng portfolio cá nhân và không ngừng quan sát cái đẹp từ cuộc sống.',
+          questions: [
+            "Tôi rất sáng tạo.",
+            "Tôi thích vẽ, tô màu và sơn.",
+            "Tôi có thể chơi một nhạc cụ.",
+            "Tôi thích tự thiết kế quán áo cho mình hoặc mặc những thời trang lạ và thú vị.",
+            "Tôi thích đọc truyện viễn tưởng, kịch và thơ ca.",
+            "Tôi thích mĩ thuật và thủ công.",
+            "Tôi xem rất nhiều phim.",
+            "Tôi thích chụp hình mọi thứ (chim, người, cảnh đẹp).",
+            "Tôi thích học một ngoại ngữ.",
+            "Tôi thích hát, đóng kịch và khiêu vũ."
+          ]
+        },
+        {
+          id: 'D',
+          name: 'Nhóm Xã hội',
+          code: 'Social (S)',
+          badgeColor: 'amber',
+          description: 'Người thân thiện, giàu lòng nhân ái, có năng khiếu sư phạm, lắng nghe, chăm sóc, làm việc nhóm và đóng góp cho cộng đồng.',
+          careers: ['Giáo viên / Giảng viên', 'Chuyên gia tâm lý học đường', 'Bác sĩ / Điều dưỡng', 'Công tác xã hội', 'Hướng dẫn viên du lịch', 'Quản trị nhân sự (HR)', 'Quan hệ công chúng (PR)', 'Tổ chức sự kiện'],
+          advice: 'Khả năng kết nối con người là điểm tựa tuyệt vời của em. Hãy trau dồi thêm kỹ năng lắng nghe tích cực và quản lý cảm xúc của bản thân.',
+          questions: [
+            "Tôi rất thân thiện.",
+            "Tôi thích chỉ dẫn hoặc dạy người khác.",
+            "Tôi thích nói chuyện trước đám đông.",
+            "Tôi làm việc rất tốt trong nhóm.",
+            "Tôi thích điều hành các cuộc thảo luận.",
+            "Tôi thích giúp đỡ những người gặp khó khăn.",
+            "Tôi chơi các môn thể thao có tính đồng đội.",
+            "Tôi thích đi dự tiệc.",
+            "Tôi thích làm quen với bạn mới.",
+            "Tôi thích làm việc với các nhóm hoạt động xã hội tại trường học, nhà thờ, chùa, phường, xóm, hay cộng đồng."
+          ]
+        },
+        {
+          id: 'E',
+          name: 'Nhóm Quản lí',
+          code: 'Enterprising (E)',
+          badgeColor: 'rose',
+          description: 'Người có tố chất thủ lĩnh, tự tin, quyết đoán, khả năng thuyết phục, đàm phán, thích kinh doanh và quản lý tổ chức.',
+          careers: ['Quản trị kinh doanh', 'Doanh nhân khởi nghiệp', 'Giám đốc kinh doanh / Marketing', 'Chuyên viên ngân hàng / Đầu tư tài chính', 'Môi giới bất động sản', 'Luật sư / Cố vấn pháp lý', 'Nhà ngoại giao'],
+          advice: 'Hãy rèn luyện thêm tư duy tài chính, kỹ năng lập kế hoạch chiến lược và khả năng truyền cảm hứng đến các thành viên trong đội ngũ.',
+          questions: [
+            "Tôi thích học hỏi về tài chính (tiền bạc).",
+            "Tôi thích bán các sản phẩm (kẹo, bút viết,...).",
+            "Tôi nghĩ mình thuộc dạng nổi tiếng ở trường.",
+            "Tôi thích lãnh đạo nhóm và các cuộc thảo luận.",
+            "Tôi thích được bầu vào các vị trí quan trọng trong nhóm hoặc câu lạc bộ trong và ngoài nhà trường.",
+            "Tôi thích có quyền và thích ở vị trí lãnh đạo.",
+            "Tôi muốn sở hữu một doanh nghiệp nhỏ.",
+            "Tôi thích tiết kiệm tiền.",
+            "Tôi thích làm việc cho tới khi công việc hoàn tất.",
+            "Tôi thích mạo hiểm và tham gia các cuộc phiêu lưu mới."
+          ]
+        },
+        {
+          id: 'G',
+          name: 'Nhóm Nghiệp vụ',
+          code: 'Conventional (C)',
+          badgeColor: 'teal',
+          description: 'Người cẩn thận, ngăn nắp, có tính kỷ luật cao, tôn trọng quy tắc và làm việc rất chuẩn xác với các con số, văn bản, hồ sơ.',
+          careers: ['Kế toán / Kiểm toán', 'Thư ký / Trợ lý điều hành', 'Chuyên viên quản trị văn phòng', 'Thủ quỹ / Chuyên viên giao dịch ngân hàng', 'Lưu trữ thông tin / Thủ thư', 'Chuyên viên quản lý hồ sơ, công chứng', 'Hải quan / Thẩm định'],
+          advice: 'Tính chuẩn xác và kiên nhẫn của em là lợi thế cực lớn. Hãy kết hợp thêm việc thành thạo các phần mềm tin học văn phòng hiện đại.',
+          questions: [
+            "Tôi thích gọn gàng và ngăn nắp.",
+            "Tôi thích phòng của tôi thường xuyên gọn gàng và ngăn nắp.",
+            "Tôi thích sưu tầm các bài báo về các sự kiện nổi tiếng.",
+            "Tôi thích lập những danh sách các việc cần làm.",
+            "Tôi thích sử dụng máy tính.",
+            "Tôi rất thực tế và cân nhắc mọi chi phí trước khi mua một thứ gì đó.",
+            "Tôi thích đánh máy bài tập của trường lớp hơn là viết tay.",
+            "Tôi thích đảm nhận công việc thư kí trong một câu lạc bộ hay nhóm.",
+            "Khi làm toán, tôi hay kiểm tra lại bài làm nhiều lần.",
+            "Tôi thích viết thư."
+          ]
+        }
+      ]
+    };
+
+    // ----------------------------------------------------
+    // 2. STATE ỨNG DỤNG
+    // ----------------------------------------------------
+    let currentTableIndex = 0;
+    let studentInfo = {
+      name: '',
+      class: ''
+    };
+    // answers[tableId][questionIndex] = 0 hoặc 1
+    let answers = {
+      'A': Array(10).fill(0),
+      'B': Array(10).fill(0),
+      'C': Array(10).fill(0),
+      'D': Array(10).fill(0),
+      'E': Array(10).fill(0),
+      'G': Array(10).fill(0),
+    };
+
+    let studentRadarChartInstance = null;
+    let teacherBarChartInstance = null;
+    let teacherPollingInterval = null;
+    let cachedTeacherResults = [];
+
+    // ----------------------------------------------------
+    // 3. KHỞI TẠO BAN ĐẦU
+    // ----------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      renderTabs();
+      checkUrlParams();
+      setupTeacherAutoRefresh();
+    });
+
+    function checkUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('role') === 'teacher') {
+        toggleView('teacher');
+      }
+    }
+
+    // Chuyển đổi qua lại giữa Học sinh và Giáo viên
+    function toggleView(view) {
+      const studentView = document.getElementById('studentView');
+      const teacherView = document.getElementById('teacherView');
+      const btnToTeacher = document.getElementById('btnSwitchToTeacher');
+      const btnToStudent = document.getElementById('btnSwitchToStudent');
+
+      if (view === 'teacher') {
+        studentView.classList.add('hidden');
+        teacherView.classList.remove('hidden');
+        btnToTeacher.classList.add('hidden');
+        btnToStudent.classList.remove('hidden');
+        btnToStudent.classList.add('flex');
+        loadTeacherResults();
+      } else {
+        teacherView.classList.add('hidden');
+        studentView.classList.remove('hidden');
+        btnToStudent.classList.add('hidden');
+        btnToTeacher.classList.remove('hidden');
+      }
+    }
+
+    // ----------------------------------------------------
+    // 4. LUỒNG LÀM BÀI CỦA HỌC SINH
+    // ----------------------------------------------------
+    function startQuiz() {
+      const name = document.getElementById('inputStudentName').value.trim();
+      const cls = document.getElementById('inputStudentClass').value.trim();
+
+      if (!name) {
+        alert('Em vui lòng nhập Họ và tên trước khi bắt đầu nhé!');
+        document.getElementById('inputStudentName').focus();
+        return;
+      }
+      if (!cls) {
+        alert('Em vui lòng nhập Lớp của mình nhé!');
+        document.getElementById('inputStudentClass').focus();
+        return;
+      }
+
+      studentInfo.name = name;
+      studentInfo.class = cls;
+
+      document.getElementById('displayActiveStudent').innerText = name;
+      document.getElementById('displayActiveClass').innerText = cls;
+
+      document.getElementById('studentStepIntro').classList.add('hidden');
+      document.getElementById('studentStepQuiz').classList.remove('hidden');
+
+      showTable(0);
+    }
+
+    function renderTabs() {
+      const container = document.getElementById('tableTabs');
+      container.innerHTML = HOLLAND_DATA.tables.map((tbl, idx) => `
+        <button onclick="showTable(${idx})" id="tabBtn_${idx}" class="py-2 px-1 text-center rounded-lg text-xs font-bold transition flex flex-col items-center justify-center ${idx === 0 ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-500 hover:text-slate-800'}">
+          <span class="text-sm">Bảng ${tbl.id}</span>
+          <span id="tabScore_${tbl.id}" class="text-[10px] font-semibold text-slate-400">0/10</span>
+        </button>
+      `).join('');
+    }
+
+    function showTable(index, scroll = true) {
+      currentTableIndex = index;
+      const tbl = HOLLAND_DATA.tables[index];
+
+      // Cập nhật tab active
+      HOLLAND_DATA.tables.forEach((_, idx) => {
+        const btn = document.getElementById(`tabBtn_${idx}`);
+        if (btn) {
+          if (idx === index) {
+            btn.className = "py-2 px-1 text-center rounded-lg text-xs font-bold transition flex flex-col items-center justify-center bg-white text-blue-600 shadow-xs";
+          } else {
+            btn.className = "py-2 px-1 text-center rounded-lg text-xs font-bold transition flex flex-col items-center justify-center text-slate-500 hover:text-slate-800";
+          }
+        }
+      });
+
+      // Cập nhật Header bảng
+      document.getElementById('currentTableBadge').innerText = `Bảng ${tbl.id}`;
+      document.getElementById('currentTableTitle').innerText = tbl.name;
+      updateTableScoreDisplay(tbl.id);
+
+      // Cập nhật nút điều hướng
+      document.getElementById('btnPrevTable').style.visibility = index === 0 ? 'hidden' : 'visible';
+      if (index === HOLLAND_DATA.tables.length - 1) {
+        document.getElementById('btnNextTable').innerHTML = `<span>Xem lại Bảng A</span> <span>↩</span>`;
+      } else {
+        document.getElementById('btnNextTable').innerHTML = `<span>Bảng tiếp theo</span> <span>→</span>`;
+      }
+
+      // Render danh sách 10 câu
+      const qContainer = document.getElementById('questionsContainer');
+      qContainer.innerHTML = tbl.questions.map((qText, qIdx) => {
+        const currentScore = answers[tbl.id][qIdx] || 0;
+        return `
+          <div id="q_card_${qIdx}" class="p-3.5 rounded-xl border transition ${currentScore === 1 ? 'bg-blue-50/60 border-blue-200' : 'bg-slate-50/60 border-slate-200'}">
+            <div class="flex items-start gap-2.5 mb-2.5">
+              <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">${qIdx + 1}</span>
+              <p class="text-sm font-medium text-slate-800 leading-snug">${qText}</p>
+            </div>
+            
+            <!-- 2 Lựa chọn 0 điểm hoặc 1 điểm -->
+            <div class="grid grid-cols-2 gap-2 mt-2">
+              <button type="button" id="btn_q_${qIdx}_0" onclick="setAnswer('${tbl.id}', ${qIdx}, 0)" class="py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${currentScore === 0 ? 'bg-slate-200 text-slate-700 ring-2 ring-slate-400' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-100'}">
+                <span>✕</span> 0 điểm (Không)
+              </button>
+              <button type="button" id="btn_q_${qIdx}_1" onclick="setAnswer('${tbl.id}', ${qIdx}, 1)" class="py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${currentScore === 1 ? 'bg-blue-600 text-white shadow-sm ring-2 ring-blue-600' : 'bg-white text-blue-600 border border-blue-200 hover:bg-blue-50'}">
+                <span>✓</span> 1 điểm (Đúng)
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Chỉ cuộn lên đầu khi chuyển hẳn sang bảng mới
+      if (scroll) {
+        window.scrollTo({ top: 100, behavior: 'smooth' });
+      }
+    }
+
+    function setAnswer(tableId, questionIndex, score) {
+      answers[tableId][questionIndex] = score;
+      if (navigator.vibrate) navigator.vibrate(15);
+      
+      updateTableScoreDisplay(tableId);
+      updateTotalScoreDisplay();
+
+      // Cập nhật giao diện trực tiếp tại câu hỏi đó (KHÔNG render lại toàn bộ và KHÔNG cuộn trang)
+      const card = document.getElementById(`q_card_${questionIndex}`);
+      const btn0 = document.getElementById(`btn_q_${questionIndex}_0`);
+      const btn1 = document.getElementById(`btn_q_${questionIndex}_1`);
+
+      if (card && btn0 && btn1) {
+        if (score === 1) {
+          card.className = "p-3.5 rounded-xl border transition bg-blue-50/60 border-blue-200";
+          btn0.className = "py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-500 border border-slate-200 hover:bg-slate-100";
+          btn1.className = "py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-blue-600 text-white shadow-sm ring-2 ring-blue-600";
+        } else {
+          card.className = "p-3.5 rounded-xl border transition bg-slate-50/60 border-slate-200";
+          btn0.className = "py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-slate-200 text-slate-700 ring-2 ring-slate-400";
+          btn1.className = "py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-white text-blue-600 border border-blue-200 hover:bg-blue-50";
+        }
+      }
+    }
+
+    function updateTableScoreDisplay(tableId) {
+      const sum = answers[tableId].reduce((a, b) => a + b, 0);
+      document.getElementById('currentTableScoreBadge').innerText = `${sum}/10`;
+      const tabScoreBadge = document.getElementById(`tabScore_${tableId}`);
+      if (tabScoreBadge) tabScoreBadge.innerText = `${sum}/10`;
+    }
+
+    function updateTotalScoreDisplay() {
+      let total = 0;
+      Object.keys(answers).forEach(k => {
+        total += answers[k].reduce((a, b) => a + b, 0);
+      });
+      document.getElementById('totalScoreCount').innerText = `Tổng: ${total}/60 điểm`;
+    }
+
+    function prevTable() {
+      if (currentTableIndex > 0) {
+        showTable(currentTableIndex - 1);
+      }
+    }
+
+    function nextTable() {
+      if (currentTableIndex < HOLLAND_DATA.tables.length - 1) {
+        showTable(currentTableIndex + 1);
+      } else {
+        showTable(0);
+      }
+    }
+
+    // ----------------------------------------------------
+    // 5. NỘP BÀI & HIỆN NGAY KẾT QUẢ PHÂN TÍCH
+    // ----------------------------------------------------
+    async function submitStudentResults() {
+      // Tính điểm từng bảng
+      const scores = {
+        score_a: answers['A'].reduce((a, b) => a + b, 0),
+        score_b: answers['B'].reduce((a, b) => a + b, 0),
+        score_c: answers['C'].reduce((a, b) => a + b, 0),
+        score_d: answers['D'].reduce((a, b) => a + b, 0),
+        score_e: answers['E'].reduce((a, b) => a + b, 0),
+        score_g: answers['G'].reduce((a, b) => a + b, 0),
+      };
+
+      // Xếp hạng các bảng theo điểm giảm dần
+      const ranked = [
+        { id: 'A', name: 'Nhóm Kĩ thuật', score: scores.score_a },
+        { id: 'B', name: 'Nhóm Nghiên cứu', score: scores.score_b },
+        { id: 'C', name: 'Nhóm Nghệ thuật', score: scores.score_c },
+        { id: 'D', name: 'Nhóm Xã hội', score: scores.score_d },
+        { id: 'E', name: 'Nhóm Quản lí', score: scores.score_e },
+        { id: 'G', name: 'Nhóm Nghiệp vụ', score: scores.score_g },
+      ].sort((a, b) => b.score - a.score);
+
+      const topGroup = ranked[0];
+      const secondGroup = ranked[1];
+
+      // Gửi về Server Backend (hoặc lưu LocalStorage nếu chạy file HTML độc lập)
+      const payload = {
+        student_name: studentInfo.name,
+        class_name: studentInfo.class,
+        score_a: scores.score_a,
+        score_b: scores.score_b,
+        score_c: scores.score_c,
+        score_d: scores.score_d,
+        score_e: scores.score_e,
+        score_g: scores.score_g,
+        top_group: topGroup.id,
+        top_group_name: topGroup.name,
+        details: answers
+      };
+
+      try {
+        await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch (err) {
+        console.warn('Đang hoạt động ở chế độ Local (Lưu vào trình duyệt):', err);
+        saveLocalResult(payload);
+      }
+
+      // Hiển thị màn hình kết quả ngay lập tức
+      displayResultScreen(ranked, scores);
+    }
+
+    function saveLocalResult(item) {
+      let list = [];
+      try {
+        list = JSON.parse(localStorage.getItem('holland_results') || '[]');
+      } catch (e) { list = []; }
+      item.id = Date.now();
+      item.created_at = new Date().toISOString();
+      list.unshift(item);
+      localStorage.setItem('holland_results', JSON.stringify(list));
+    }
+
+    function displayResultScreen(ranked, scores) {
+      document.getElementById('studentStepQuiz').classList.add('hidden');
+      document.getElementById('studentStepResult').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Pháo hoa ăn mừng
+      try {
+        confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+      } catch (e) {}
+
+      const top1 = ranked[0];
+      const top2 = ranked[1];
+      const topTbl = HOLLAND_DATA.tables.find(t => t.id === top1.id);
+
+      document.getElementById('resultTimestamp').innerText = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('resultTopGroupName').innerText = `${topTbl.name} (${topTbl.code})`;
+      document.getElementById('resultTopGroupTag').innerText = `Bảng ${topTbl.id} • Đạt ${top1.score}/10 điểm cao nhất`;
+
+      // Nếu nhóm thứ 2 có điểm bằng hoặc suýt soát (chênh <= 1 điểm)
+      const secondaryBadge = document.getElementById('resultSecondaryBadge');
+      if (top2 && (top1.score - top2.score <= 1) && top2.score > 3) {
+        secondaryBadge.classList.remove('hidden');
+        secondaryBadge.innerText = `✨ Nhóm hỗ trợ rất mạnh: ${top2.name} (Bảng ${top2.id} - ${top2.score} điểm)`;
+      } else {
+        secondaryBadge.classList.add('hidden');
+      }
+
+      // Render Bảng Tổng Hợp chuẩn SBT
+      const sbtTbody = document.getElementById('sbtSummaryTableBody');
+      const tableOrder = ['A', 'B', 'C', 'D', 'E', 'G'];
+      sbtTbody.innerHTML = tableOrder.map(id => {
+        const tbl = HOLLAND_DATA.tables.find(t => t.id === id);
+        const scoreKey = `score_${id.toLowerCase()}`;
+        const sc = scores[scoreKey];
+        const isTop = id === top1.id;
+        return `
+          <tr class="${isTop ? 'bg-blue-50/80 font-bold text-blue-900' : 'hover:bg-slate-50'}">
+            <td class="py-2.5 px-3">Bảng ${tbl.id}</td>
+            <td class="py-2.5 px-3 flex items-center gap-1.5">
+              <span>${tbl.name}</span>
+              ${isTop ? '<span class="text-xs bg-blue-600 text-white px-1.5 py-0.2 rounded font-normal">Cao nhất</span>' : ''}
+            </td>
+            <td class="py-2.5 px-3 text-center font-extrabold ${isTop ? 'text-blue-600 text-base' : 'text-slate-700'}">${sc}</td>
+            <td class="py-2.5 px-2 text-center text-xs">
+              <span class="px-2 py-0.5 rounded-full ${sc >= 7 ? 'bg-emerald-100 text-emerald-700' : sc >= 4 ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'}">
+                ${sc >= 7 ? 'Rất phù hợp' : sc >= 4 ? 'Tương đối' : 'Ít quan tâm'}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Render chi tiết tính cách & ngành nghề
+      document.getElementById('resultTraitsDesc').innerText = topTbl.description;
+      document.getElementById('resultAdviceDesc').innerText = topTbl.advice;
+      
+      const careersList = document.getElementById('resultCareersList');
+      careersList.innerHTML = topTbl.careers.map(car => `
+        <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+          💼 ${car}
+        </span>
+      `).join('');
+
+      // Vẽ Biểu đồ Radar Chart
+      renderStudentRadarChart(scores);
+    }
+
+    function renderStudentRadarChart(scores) {
+      const ctx = document.getElementById('studentRadarChart');
+      if (!ctx) return;
+
+      if (studentRadarChartInstance) {
+        studentRadarChartInstance.destroy();
+      }
+
+      studentRadarChartInstance = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: ['Kĩ thuật (A)', 'Nghiên cứu (B)', 'Nghệ thuật (C)', 'Xã hội (D)', 'Quản lí (E)', 'Nghiệp vụ (G)'],
+          datasets: [{
+            label: 'Điểm của em',
+            data: [scores.score_a, scores.score_b, scores.score_c, scores.score_d, scores.score_e, scores.score_g],
+            backgroundColor: 'rgba(59, 130, 246, 0.25)',
+            borderColor: 'rgba(37, 99, 235, 1)',
+            borderWidth: 2.5,
+            pointBackgroundColor: 'rgba(37, 99, 235, 1)',
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              min: 0,
+              max: 10,
+              ticks: { stepSize: 2, font: { family: 'Be Vietnam Pro', size: 10 } },
+              pointLabels: { font: { family: 'Be Vietnam Pro', size: 11, weight: '600' } }
+            }
+          },
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    function retakeQuiz() {
+      if (confirm('Em có muốn bắt đầu chấm lại từ đầu không?')) {
+        answers = { 'A': Array(10).fill(0), 'B': Array(10).fill(0), 'C': Array(10).fill(0), 'D': Array(10).fill(0), 'E': Array(10).fill(0), 'G': Array(10).fill(0) };
+        updateTotalScoreDisplay();
+        HOLLAND_DATA.tables.forEach(t => updateTableScoreDisplay(t.id));
+        document.getElementById('studentStepResult').classList.add('hidden');
+        document.getElementById('studentStepQuiz').classList.remove('hidden');
+        showTable(0);
+      }
+    }
+
+    // ----------------------------------------------------
+    // 6. GIAO DIỆN GIÁO VIÊN & ĐỒNG BỘ DỮ LIỆU
+    // ----------------------------------------------------
+    async function loadTeacherResults() {
+      let results = [];
+      try {
+        const res = await fetch('/api/results');
+        if (res.ok) {
+          results = await res.json();
+        } else {
+          throw new Error('API server không phản hồi');
+        }
+      } catch (err) {
+        // Fallback đọc từ LocalStorage
+        try {
+          results = JSON.parse(localStorage.getItem('holland_results') || '[]');
+        } catch (e) { results = []; }
+      }
+
+      cachedTeacherResults = results;
+      updateTeacherKPIs(results);
+      updateClassFilterOptions(results);
+      renderTeacherTable();
+      renderTeacherBarChart(results);
+    }
+
+    function setupTeacherAutoRefresh() {
+      // Tự động làm mới mỗi 3 giây khi giáo viên đang mở tab
+      setInterval(() => {
+        const teacherView = document.getElementById('teacherView');
+        if (!teacherView.classList.contains('hidden')) {
+          loadTeacherResults();
+        }
+      }, 3000);
+    }
+
+    function updateTeacherKPIs(results) {
+      document.getElementById('statTotalStudents').innerText = results.length;
+
+      // Đếm số lớp
+      const classes = new Set(results.map(r => r.class_name).filter(Boolean));
+      document.getElementById('statTotalClasses').innerText = classes.size;
+
+      // Nhóm nghề phổ biến nhất
+      const groupCounts = { 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0, 'G': 0 };
+      results.forEach(r => {
+        if (r.top_group && groupCounts[r.top_group] !== undefined) {
+          groupCounts[r.top_group]++;
+        }
+      });
+
+      let maxCount = -1;
+      let topG = '-';
+      Object.keys(groupCounts).forEach(g => {
+        if (groupCounts[g] > maxCount && groupCounts[g] > 0) {
+          maxCount = groupCounts[g];
+          const tbl = HOLLAND_DATA.tables.find(t => t.id === g);
+          topG = tbl ? tbl.name : g;
+        }
+      });
+      document.getElementById('statTopGroup').innerText = topG !== '-' ? `${topG} (${maxCount} em)` : 'Chưa có';
+    }
+
+    function updateClassFilterOptions(results) {
+      const select = document.getElementById('filterClassSelect');
+      const currentVal = select.value;
+      const classes = Array.from(new Set(results.map(r => r.class_name).filter(Boolean))).sort();
+
+      select.innerHTML = '<option value="ALL">Tất cả các lớp</option>' + 
+        classes.map(c => `<option value="${c}" ${c === currentVal ? 'selected' : ''}>Lớp ${c}</option>`).join('');
+    }
+
+    function renderTeacherTable() {
+      const filterClass = document.getElementById('filterClassSelect').value;
+      const keyword = (document.getElementById('searchStudentInput').value || '').toLowerCase().trim();
+
+      const filtered = cachedTeacherResults.filter(row => {
+        const matchClass = filterClass === 'ALL' || row.class_name === filterClass;
+        const matchKeyword = !keyword || (row.student_name && row.student_name.toLowerCase().includes(keyword));
+        return matchClass && matchKeyword;
+      });
+
+      document.getElementById('tableShowingCount').innerText = `Hiển thị ${filtered.length} / ${cachedTeacherResults.length} học sinh`;
+
+      const tbody = document.getElementById('teacherTableBody');
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="11" class="text-center py-10 text-slate-400">
+              Chưa có dữ liệu học sinh nào phù hợp. Học sinh vào làm bài sẽ tự động xuất hiện tại đây!
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((row, index) => {
+        const timeStr = row.created_at ? new Date(row.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '';
+        const groupBadges = {
+          'A': 'bg-blue-100 text-blue-800',
+          'B': 'bg-emerald-100 text-emerald-800',
+          'C': 'bg-purple-100 text-purple-800',
+          'D': 'bg-amber-100 text-amber-800',
+          'E': 'bg-rose-100 text-rose-800',
+          'G': 'bg-teal-100 text-teal-800'
+        };
+        const badgeClass = groupBadges[row.top_group] || 'bg-slate-100 text-slate-800';
+
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-2.5 px-3 text-center text-slate-400">${index + 1}</td>
+            <td class="py-2.5 px-4 font-bold text-slate-900">${row.student_name}</td>
+            <td class="py-2.5 px-3 text-center font-medium">${row.class_name}</td>
+            <td class="py-2.5 px-2 text-center font-bold ${row.top_group === 'A' ? 'text-blue-700 bg-blue-50/60' : ''}">${row.score_a}</td>
+            <td class="py-2.5 px-2 text-center font-bold ${row.top_group === 'B' ? 'text-emerald-700 bg-emerald-50/60' : ''}">${row.score_b}</td>
+            <td class="py-2.5 px-2 text-center font-bold ${row.top_group === 'C' ? 'text-purple-700 bg-purple-50/60' : ''}">${row.score_c}</td>
+            <td class="py-2.5 px-2 text-center font-bold ${row.top_group === 'D' ? 'text-amber-700 bg-amber-50/60' : ''}">${row.score_d}</td>
+            <td class="py-2.5 px-2 text-center font-bold ${row.top_group === 'E' ? 'text-rose-700 bg-rose-50/60' : ''}">${row.score_e}</td>
+            <td class="py-2.5 px-2 text-center font-bold ${row.top_group === 'G' ? 'text-teal-700 bg-teal-50/60' : ''}">${row.score_g}</td>
+            <td class="py-2.5 px-4 text-center">
+              <span class="inline-block px-2.5 py-1 rounded-full text-xs font-bold ${badgeClass}">
+                ${row.top_group_name || ('Bảng ' + row.top_group)}
+              </span>
+            </td>
+            <td class="py-2.5 px-3 text-center text-slate-400 text-[11px]">${timeStr}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderTeacherBarChart(results) {
+      const ctx = document.getElementById('teacherBarChart');
+      if (!ctx) return;
+
+      const counts = { 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0, 'G': 0 };
+      results.forEach(r => {
+        if (r.top_group && counts[r.top_group] !== undefined) {
+          counts[r.top_group]++;
+        }
+      });
+
+      if (teacherBarChartInstance) {
+        teacherBarChartInstance.destroy();
+      }
+
+      teacherBarChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['A - Kĩ thuật', 'B - Nghiên cứu', 'C - Nghệ thuật', 'D - Xã hội', 'E - Quản lí', 'G - Nghiệp vụ'],
+          datasets: [{
+            label: 'Số học sinh',
+            data: [counts['A'], counts['B'], counts['C'], counts['D'], counts['E'], counts['G']],
+            backgroundColor: [
+              'rgba(59, 130, 246, 0.8)',
+              'rgba(16, 185, 129, 0.8)',
+              'rgba(168, 85, 247, 0.8)',
+              'rgba(245, 158, 11, 0.8)',
+              'rgba(244, 63, 94, 0.8)',
+              'rgba(20, 184, 166, 0.8)'
+            ],
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 1, precision: 0 }
+            }
+          }
+        }
+      });
+    }
+
+    // ----------------------------------------------------
+    // 7. XUẤT EXCEL & MÃ QR
+    // ----------------------------------------------------
+    function exportToExcel() {
+      if (cachedTeacherResults.length === 0) {
+        alert('Chưa có học sinh nào nộp bài để xuất file Excel!');
+        return;
+      }
+
+      const rows = cachedTeacherResults.map((r, idx) => ({
+        "STT": idx + 1,
+        "Họ và tên": r.student_name,
+        "Lớp": r.class_name,
+        "Bảng A - Kĩ thuật": r.score_a,
+        "Bảng B - Nghiên cứu": r.score_b,
+        "Bảng C - Nghệ thuật": r.score_c,
+        "Bảng D - Xã hội": r.score_d,
+        "Bảng E - Quản lí": r.score_e,
+        "Bảng G - Nghiệp vụ": r.score_g,
+        "Nhóm cao nhất": r.top_group_name || ('Bảng ' + r.top_group),
+        "Thời gian nộp": r.created_at || ''
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Bang_Tong_Hop_Holland");
+      
+      const fileName = `Bang_Tong_Hop_Holland_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      XLSX.writeFile(workbook, fileName);
+    }
+
+    async function showQRCodeModal() {
+      let targetUrl = window.location.origin;
+      try {
+        const res = await fetch('/api/info');
+        if (res.ok) {
+          const info = await res.json();
+          targetUrl = info.student_url;
+        }
+      } catch (e) {}
+
+      document.getElementById('qrLinkInput').value = targetUrl;
+
+      const container = document.getElementById('qrcodeCanvas');
+      container.innerHTML = '';
+      new QRCode(container, {
+        text: targetUrl,
+        width: 220,
+        height: 220,
+        colorDark: "#1e293b",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+
+      document.getElementById('qrModal').classList.remove('hidden');
+    }
+
+    function hideQRCodeModal() {
+      document.getElementById('qrModal').classList.add('hidden');
+    }
+
+    function copyQRLink() {
+      const input = document.getElementById('qrLinkInput');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      alert('Đã sao chép liên kết vào bộ nhớ tạm: ' + input.value);
+    }
+
+    async function clearAllDataConfirm() {
+      if (confirm('Thầy/Cô có chắc chắn muốn xóa toàn bộ danh sách kết quả học sinh cũ để chuẩn bị cho tiết học mới không?')) {
+        try {
+          await fetch('/api/clear', { method: 'POST' });
+        } catch (e) {}
+        localStorage.removeItem('holland_results');
+        loadTeacherResults();
+        alert('Đã xóa dữ liệu thành công!');
+      }
+    }
+  </script>
+</body>
+</html>
